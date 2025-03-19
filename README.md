@@ -122,8 +122,9 @@ Contributions are welcome! Feel free to fork, submit issues, or create pull requ
 
 
 ## 📧 Contact
-For inquiries, feel free to reach out at [21522687@gm.uit.edu.vn](21522687@gm.uit.edu.vn) or open an issue in the repository.
+For inquiries, feel free to reach out at [21522687@gm.uit.edu.vn](https://mail.google.com/mail) or open an issue in the repository.
 
 ---
 
 🚀 **Let's build a safer web with injex-watch!**
+ 
