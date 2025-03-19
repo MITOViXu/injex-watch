@@ -120,11 +120,9 @@ npm start
 ## 🤝 Contributing
 Contributions are welcome! Feel free to fork, submit issues, or create pull requests.
 
-## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 📧 Contact
-For inquiries, feel free to reach out at [your-email@example.com](mailto:your-email@example.com) or open an issue in the repository.
+For inquiries, feel free to reach out at [21522687@gm.uit.edu.vn](21522687@gm.uit.edu.vn) or open an issue in the repository.
 
 ---
 
