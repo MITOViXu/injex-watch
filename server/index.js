@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
+import generalRoutes from "./routes/general.js";
 
 dotenv.config();
 const app = express();
@@ -18,9 +19,13 @@ app.use(cors());
 
 /* ROUTES */
 // app.use("/client", clientRoutes);
-// app.use("/general", generalRoutes);
+app.use("/general", generalRoutes);
 // app.use("/management", managementRoutes);
 // app.use("/sales", salesRoutes);
+
+// data import
+import User from "./models/User.js";
+import { dataUser } from "./data/index.js";
 
 /* MONGOOSE SETUP */
 const PORT = 5001 || 8080;
