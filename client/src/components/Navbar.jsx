@@ -10,7 +10,7 @@ import {
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
 import { setMode } from "state";
-import profileImage from "assets/mtoan.jpg";
+import profileImage from "assets/profile.jpeg";
 import {
   AppBar,
   Button,
@@ -23,8 +23,6 @@ import {
   MenuItem,
   useTheme,
 } from "@mui/material";
-import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
@@ -44,29 +42,25 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
-        {/* { Thanh bên trái} */}
+        {/* LEFT SIDE */}
         <FlexBetween>
           <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            {!isSidebarOpen ? (
-              <KeyboardDoubleArrowRightIcon />
-            ) : (
-              <KeyboardDoubleArrowLeftIcon />
-            )}
+            <MenuIcon />
           </IconButton>
-
           <FlexBetween
             backgroundColor={theme.palette.background.alt}
             borderRadius="9px"
             gap="3rem"
             p="0.1rem 1.5rem"
           >
-            <InputBase placeholder="Search ..." />
+            <InputBase placeholder="Search..." />
             <IconButton>
               <Search />
             </IconButton>
           </FlexBetween>
         </FlexBetween>
-        {/* bên phải */}
+
+        {/* RIGHT SIDE */}
         <FlexBetween gap="1.5rem">
           <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
@@ -78,6 +72,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
           <IconButton>
             <SettingsOutlined sx={{ fontSize: "25px" }} />
           </IconButton>
+
           <FlexBetween>
             <Button
               onClick={handleClick}
@@ -104,13 +99,13 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                   fontSize="0.85rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-                  Minh Toàn
+                  {user.name}
                 </Typography>
                 <Typography
                   fontSize="0.75rem"
                   sx={{ color: theme.palette.secondary[200] }}
                 >
-                  21522687
+                  {user.occupation}
                 </Typography>
               </Box>
               <ArrowDropDownOutlined
