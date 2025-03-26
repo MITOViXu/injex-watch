@@ -13,6 +13,7 @@ export const api = createApi({
     "Admins",
     "Performance",
     "Dashboard",
+    "Device",
   ],
   endpoints: (build) => ({
     getUser: build.query({
@@ -55,6 +56,31 @@ export const api = createApi({
       query: () => "general/dashboard",
       providesTags: ["Dashboard"],
     }),
+    getDevice: build.query({
+      query: () => "device/getAll",
+      providesTags: ["Device"],
+    }),
+    addDevice: build.mutation({
+      query: (device) => ({
+        url: "/device/create",
+        method: "POST",
+        body: device,
+      }),
+    }),
+    deleteDevice: build.mutation({
+      query: (id) => ({
+        url: `/device/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Device"],
+    }),
+    updateDevice: build.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/device/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -68,4 +94,8 @@ export const {
   useGetAdminsQuery,
   useGetUserPerformanceQuery,
   useGetDashboardQuery,
+  useGetDeviceQuery,
+  useAddDeviceMutation,
+  useDeleteDeviceMutation,
+  useUpdateDeviceMutation,
 } = api;

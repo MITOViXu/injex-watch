@@ -1,12 +1,12 @@
 import React from "react";
 import { Box, useTheme } from "@mui/material";
-import { useGetCustomersQuery } from "state/api";
+import { useGetDeviceQuery } from "state/api";
 import Header from "components/Header";
 import { DataGrid } from "@mui/x-data-grid";
 
 const Customers = () => {
   const theme = useTheme();
-  const { data, isLoading } = useGetCustomersQuery();
+  const { data, isLoading } = useGetDeviceQuery();
   console.log("data", data);
 
   const columns = [

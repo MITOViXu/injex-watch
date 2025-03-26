@@ -1,101 +1,162 @@
-import React from "react";
-import { Box, useTheme } from "@mui/material";
-import { useGetGeographyQuery } from "state/api";
-import Header from "components/Header";
-import { ResponsiveChoropleth } from "@nivo/geo";
-import { geoData } from "state/geoData";
+import React, { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Icon cho marker
+const customIcon = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/2776/2776067.png",
+  iconSize: [32, 32],
+});
 
 const Geography = () => {
-  const theme = useTheme();
-  const { data } = useGetGeographyQuery();
+  // State để lưu tọa độ và IP
+  const [position, setPosition] = useState(null);
+  const [ipAddress, setIpAddress] = useState("");
+  const [ob, setOb] = useState(null);
+
+  // State cho trạng thái website
+  const [websiteStatus, setWebsiteStatus] = useState("Checking...");
+  const [responseTime, setResponseTime] = useState("N/A");
+
+  // Lấy tọa độ thực tế từ trình duyệt
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Tọa độ thực tế:", position.coords);
+          setPosition({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          window.alert("Lỗi khi lấy tọa độ");
+          console.error("Lỗi khi lấy tọa độ:", error);
+        }
+      );
+    } else {
+      window.alert("Trình duyệt không hỗ trợ");
+      console.error("Trình duyệt không hỗ trợ Geolocation");
+    }
+  };
+
+  // Lấy địa chỉ IP thực tế
+  const getIPAddress = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const data = await response.json();
+      setIpAddress(data.ip);
+    } catch (error) {
+      console.error("Lỗi khi lấy địa chỉ IP:", error);
+      setIpAddress("Không thể lấy địa chỉ IP");
+    }
+  };
+
+  // Lấy IP của kẻ tấn công (dùng ip-api)
+  useEffect(() => {
+    fetch("http://ip-api.com/json/?fields=61439")
+      .then((res) => res.json())
+      .then((res) => {
+        console.log("Ip của kẻ tấn công", res);
+        setOb(res.query);
+      });
+  }, []);
+
+  // Kiểm tra trạng thái website
+  const checkWebsiteStatus = async () => {
+    try {
+      const start = Date.now(); // Bắt đầu tính thời gian phản hồi
+      const response = await fetch("http://192.168.48.128:3000/");
+      const end = Date.now(); // Kết thúc tính thời gian phản hồi
+
+      if (response.ok) {
+        setWebsiteStatus("✅ UP");
+      } else {
+        setWebsiteStatus("❌ DOWN");
+      }
+      setResponseTime(`${end - start} ms`);
+    } catch (error) {
+      setWebsiteStatus("❌ DOWN");
+      setResponseTime("N/A");
+      console.error("Error checking website status:", error);
+    }
+  };
+
+  useEffect(() => {
+    getLocation(); // Lấy tọa độ khi mở trang
+    getIPAddress(); // Lấy IP khi mở trang
+    checkWebsiteStatus(); // Kiểm tra trạng thái website ngay lập tức
+
+    const interval = setInterval(checkWebsiteStatus, 5000); // Kiểm tra lại mỗi 5 giây
+    return () => clearInterval(interval); // Dọn dẹp interval khi component bị unmount
+  }, []);
 
   return (
-    <Box m="1.5rem 2.5rem">
-      <Header title="GEOGRAPHY" subtitle="Find where your users are located." />
-      <Box
-        mt="40px"
-        height="75vh"
-        border={`1px solid ${theme.palette.secondary[200]}`}
-        borderRadius="4px"
+    <div style={{ height: "500px", width: "100%" }}>
+      {/* Hiển thị thông tin IP */}
+      <h1>Địa chỉ IP của bạn: {ipAddress}</h1>
+      <h1>IP của kẻ tấn công: {ob || "None"}</h1>
+
+      {/* Hiển thị trạng thái của website */}
+      <div>
+        <h2 className="font-bold mt-4">Website Status:</h2>
+        <p>
+          Trạng thái:{" "}
+          {websiteStatus === "✅ UP" ? (
+            <span className="text-green-500">{websiteStatus}</span>
+          ) : (
+            <span className="text-red-500">{websiteStatus}</span>
+          )}
+        </p>
+        <p>Thời gian phản hồi: {responseTime}</p>
+      </div>
+
+      {/* Hiển thị tọa độ trên bản đồ */}
+      {position ? (
+        <>
+          <h2 className="mt-4 font-bold">Toạ độ hiện tại:</h2>
+          <p>
+            Latitude: {position.latitude}, Longitude: {position.longitude}
+          </p>
+
+          <MapContainer
+            center={[position.latitude, position.longitude]}
+            zoom={15}
+            style={{ height: "100%", width: "100%", marginTop: "10px" }}
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <Marker
+              position={[position.latitude, position.longitude]}
+              icon={customIcon}
+            >
+              <Popup>
+                Vị trí hiện tại của bạn:
+                <br />
+                Lat: {position.latitude}, Lon: {position.longitude}
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </>
+      ) : (
+        <h2 className="text-red-500">Không thể lấy vị trí</h2>
+      )}
+
+      {/* Nút cập nhật vị trí */}
+      <button
+        onClick={getLocation}
+        style={{
+          marginTop: "10px",
+          padding: "8px 16px",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
       >
-        {data ? (
-          <ResponsiveChoropleth
-            data={data}
-            theme={{
-              axis: {
-                domain: {
-                  line: {
-                    stroke: theme.palette.secondary[200],
-                  },
-                },
-                legend: {
-                  text: {
-                    fill: theme.palette.secondary[200],
-                  },
-                },
-                ticks: {
-                  line: {
-                    stroke: theme.palette.secondary[200],
-                    strokeWidth: 1,
-                  },
-                  text: {
-                    fill: theme.palette.secondary[200],
-                  },
-                },
-              },
-              legends: {
-                text: {
-                  fill: theme.palette.secondary[200],
-                },
-              },
-              tooltip: {
-                container: {
-                  color: theme.palette.primary.main,
-                },
-              },
-            }}
-            features={geoData.features}
-            margin={{ top: 0, right: 0, bottom: 0, left: -50 }}
-            domain={[0, 60]}
-            unknownColor="#666666"
-            label="properties.name"
-            valueFormat=".2s"
-            projectionScale={150}
-            projectionTranslation={[0.45, 0.6]}
-            projectionRotation={[0, 0, 0]}
-            borderWidth={1.3}
-            borderColor="#ffffff"
-            legends={[
-              {
-                anchor: "bottom-right",
-                direction: "column",
-                justify: true,
-                translateX: 0,
-                translateY: -125,
-                itemsSpacing: 0,
-                itemWidth: 94,
-                itemHeight: 18,
-                itemDirection: "left-to-right",
-                itemTextColor: theme.palette.secondary[200],
-                itemOpacity: 0.85,
-                symbolSize: 18,
-                effects: [
-                  {
-                    on: "hover",
-                    style: {
-                      itemTextColor: theme.palette.background.alt,
-                      itemOpacity: 1,
-                    },
-                  },
-                ],
-              },
-            ]}
-          />
-        ) : (
-          <>Loading...</>
-        )}
-      </Box>
-    </Box>
+        Cập nhật vị trí
+      </button>
+    </div>
   );
 };
 

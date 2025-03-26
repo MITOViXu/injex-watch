@@ -28,66 +28,78 @@ import {
   TrendingUpOutlined,
   PieChartOutlined,
 } from "@mui/icons-material";
+import DevicesIcon from "@mui/icons-material/Devices";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 import profileImage from "assets/profile.jpeg";
 
 const navItems = [
+  // {
+  //   text: "Dashboard",
+  //   link: "Dashboard",
+  //   icon: <HomeOutlined />,
+  // },
+  // {
+  //   text: "Tình trạng",
+  //   icon: null,
+  // },
+  // {
+  //   text: "Thiết bị",
+  //   link: "Products",
+  //   icon: <ShoppingCartOutlined />,
+  // },
   {
-    text: "Dashboard",
-    icon: <HomeOutlined />,
+    text: "Thiết bị",
+    link: "Devices",
+    icon: <DevicesIcon />,
   },
   {
-    text: "Client Facing",
-    icon: null,
-  },
-  {
-    text: "Products",
-    icon: <ShoppingCartOutlined />,
-  },
-  {
-    text: "Customers",
-    icon: <Groups2Outlined />,
-  },
-  {
-    text: "Transactions",
+    text: "Danh sách đen",
+    link: "Transactions",
     icon: <ReceiptLongOutlined />,
   },
   {
-    text: "Geography",
+    text: "Bản đồ",
+    link: "Geography",
     icon: <PublicOutlined />,
   },
   {
-    text: "Sales",
+    text: "Thống kê",
     icon: null,
   },
   {
-    text: "Overview",
+    text: "Tổng quan",
+    link: "Overview",
     icon: <PointOfSaleOutlined />,
   },
   {
-    text: "Daily",
+    text: "Hằng ngày",
+    link: "Daily",
     icon: <TodayOutlined />,
   },
   {
-    text: "Monthly",
+    text: "Hằng tháng",
+    link: "Monthly",
     icon: <CalendarMonthOutlined />,
   },
   {
-    text: "Breakdown",
+    text: "Quý",
+    link: "Breakdown",
     icon: <PieChartOutlined />,
   },
   {
-    text: "Management",
+    text: "Quản lý",
     icon: null,
   },
   {
     text: "Admin",
+    link: "Admin",
     icon: <AdminPanelSettingsOutlined />,
   },
   {
-    text: "Performance",
+    text: "Hiệu suất",
+    link: "Performance",
     icon: <TrendingUpOutlined />,
   },
 ];
@@ -124,6 +136,7 @@ const Sidebar = ({
               boxSixing: "border-box",
               borderWidth: isNonMobile ? 0 : "2px",
               width: drawerWidth,
+              justifyContent: "space-between",
             },
           }}
         >
@@ -132,7 +145,7 @@ const Sidebar = ({
               <FlexBetween color={theme.palette.secondary.main}>
                 <Box display="flex" alignItems="center" gap="0.5rem">
                   <Typography variant="h4" fontWeight="bold">
-                    ECOMVISION
+                    INJEX WATCH
                   </Typography>
                 </Box>
                 {!isNonMobile && (
@@ -143,7 +156,7 @@ const Sidebar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems.map(({ text, icon }) => {
+              {navItems.map(({ text, link, icon }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem" }}>
@@ -151,7 +164,7 @@ const Sidebar = ({
                     </Typography>
                   );
                 }
-                const lcText = text.toLowerCase();
+                const lcText = link.toLowerCase();
 
                 return (
                   <ListItem key={text} disablePadding>
@@ -193,7 +206,7 @@ const Sidebar = ({
             </List>
           </Box>
 
-          <Box position="absolute" bottom="2rem">
+          <Box position="relative" bottom="25px" alignSelf={"bottom"}>
             <Divider />
             <FlexBetween textTransform="none" gap="1rem" m="1.5rem 2rem 0 3rem">
               <Box
@@ -211,13 +224,13 @@ const Sidebar = ({
                   fontSize="0.9rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-                  {user.name}
+                  Toàn
                 </Typography>
                 <Typography
                   fontSize="0.8rem"
                   sx={{ color: theme.palette.secondary[200] }}
                 >
-                  {user.occupation}
+                  21522687
                 </Typography>
               </Box>
               <SettingsOutlined

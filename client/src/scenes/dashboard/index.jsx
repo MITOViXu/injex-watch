@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
 import {
@@ -25,6 +25,40 @@ const Dashboard = () => {
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
   const { data, isLoading } = useGetDashboardQuery();
+  const [attack, setAttack] = useState("none");
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+
+  // Test thử hàm lấy thông tin của kẻ tấn công.
+  useEffect(() => {
+    fetch("http://ip-api.com/json/?fields=61439")
+      .then((res) => res.json())
+      .then((res) => {
+        console.log("Ip của kẻ tấn công", res);
+        setAttack(res.query);
+      });
+  }, []);
+  // Lấy tọa độ của thiết bị
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        () => {
+          alert("Không thể xác định vị trí!");
+        }
+      );
+    } else {
+      alert("Trình duyệt không hỗ trợ định vị.");
+    }
+  };
+
+  useEffect(() => {
+    getLocation(); // Tự động lấy tọa độ khi mở trang
+  }, []);
 
   const columns = [
     {
@@ -61,6 +95,7 @@ const Dashboard = () => {
     <Box m="1.5rem 2.5rem">
       <FlexBetween>
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+        <Header title={attack} />
 
         <Box>
           <Button

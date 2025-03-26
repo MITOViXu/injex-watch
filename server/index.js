@@ -9,6 +9,7 @@ import generalRoutes from "./routes/general.js";
 import clientRoutes from "./routes/client.js";
 import salesRoutes from "./routes/sales.js";
 import managementRoutes from "./routes/management.js";
+import deviceRoute from "./routes/device.js";
 import Product from "./models/Product.js";
 import ProductStat from "./models/ProductStat.js";
 import {
@@ -39,6 +40,7 @@ app.use("/client", clientRoutes);
 app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
 app.use("/sales", salesRoutes);
+app.use("/device", deviceRoute);
 
 // data import
 
