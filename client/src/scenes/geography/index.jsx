@@ -47,6 +47,7 @@ const Geography = () => {
       const response = await fetch("https://api.ipify.org?format=json");
       const data = await response.json();
       setIpAddress(data.ip);
+      console.log("Địa chỉ ip kẻ tấn công: ", data);
     } catch (error) {
       console.error("Lỗi khi lấy địa chỉ IP:", error);
       setIpAddress("Không thể lấy địa chỉ IP");
@@ -55,12 +56,42 @@ const Geography = () => {
 
   // Lấy IP của kẻ tấn công (dùng ip-api)
   useEffect(() => {
-    fetch("http://ip-api.com/json/?fields=61439")
-      .then((res) => res.json())
-      .then((res) => {
-        console.log("Ip của kẻ tấn công", res);
-        setOb(res.query);
-      });
+    fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("IP:", data);
+      })
+      .catch((error) => console.error("Error fetching IP:", error));
+    fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("IP:", data);
+      })
+      .catch((error) => console.error("Error fetching IP:", error));
+    fetch("https://api.ipify.org?format=json")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("IP:", data.ip);
+        // Dùng IP để lấy vị trí từ ip-api
+        return fetch(`http://ip-api.com/json/${data.ip}`);
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Thành phố:", data.city);
+        console.log("Khu vực:", data.regionName);
+        console.log("Quốc gia:", data.country);
+        console.log("Vĩ độ:", data.lat);
+        console.log("Kinh độ:", data.lon);
+      })
+      .catch((error) => console.error("Error:", error));
+    const getlocation = () => {
+      // Get the user location with IP address
+      fetch("https://ipapi.co/json/")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+        });
+    };
   }, []);
 
   // Kiểm tra trạng thái website
@@ -84,8 +115,8 @@ const Geography = () => {
   };
 
   useEffect(() => {
-    getLocation(); // Lấy tọa độ khi mở trang
-    getIPAddress(); // Lấy IP khi mở trang
+    // getLocation(); // Lấy tọa độ khi mở trang
+    // getIPAddress(); // Lấy IP khi mở trang
     checkWebsiteStatus(); // Kiểm tra trạng thái website ngay lập tức
 
     const interval = setInterval(checkWebsiteStatus, 5000); // Kiểm tra lại mỗi 5 giây
@@ -119,17 +150,14 @@ const Geography = () => {
           <p>
             Latitude: {position.latitude}, Longitude: {position.longitude}
           </p>
-
+          {/* latitude : 10.878976 longitude : 105.1820032 */}
           <MapContainer
-            center={[position.latitude, position.longitude]}
+            center={[10.822, 106.6257]}
             zoom={15}
             style={{ height: "100%", width: "100%", marginTop: "10px" }}
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Marker
-              position={[position.latitude, position.longitude]}
-              icon={customIcon}
-            >
+            <Marker position={[10.822, 106.6257]} icon={customIcon}>
               <Popup>
                 Vị trí hiện tại của bạn:
                 <br />

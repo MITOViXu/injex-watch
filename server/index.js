@@ -10,6 +10,7 @@ import clientRoutes from "./routes/client.js";
 import salesRoutes from "./routes/sales.js";
 import managementRoutes from "./routes/management.js";
 import deviceRoute from "./routes/device.js";
+import attackerRoute from "./routes/attacker.js";
 import Product from "./models/Product.js";
 import ProductStat from "./models/ProductStat.js";
 import {
@@ -41,6 +42,7 @@ app.use("/general", generalRoutes);
 app.use("/management", managementRoutes);
 app.use("/sales", salesRoutes);
 app.use("/device", deviceRoute);
+app.use("/attacker", attackerRoute);
 
 // data import
 

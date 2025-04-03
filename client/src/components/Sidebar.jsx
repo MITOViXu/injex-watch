@@ -56,7 +56,7 @@ const navItems = [
   },
   {
     text: "Danh sách đen",
-    link: "Transactions",
+    link: "Attackers",
     icon: <ReceiptLongOutlined />,
   },
   {
@@ -89,19 +89,19 @@ const navItems = [
     icon: <PieChartOutlined />,
   },
   {
-    text: "Quản lý",
+    text: "Thử nghiệm",
     icon: null,
   },
   {
-    text: "Admin",
-    link: "Admin",
+    text: "Tấn công",
+    link: "test",
     icon: <AdminPanelSettingsOutlined />,
   },
-  {
-    text: "Hiệu suất",
-    link: "Performance",
-    icon: <TrendingUpOutlined />,
-  },
+  // {
+  //   text: "Hiệu suất",
+  //   link: "Performance",
+  //   icon: <TrendingUpOutlined />,
+  // },
 ];
 
 const Sidebar = ({

@@ -17,6 +17,8 @@ import Breakdown from "scenes/breakdown";
 import Admin from "scenes/admin";
 import Performance from "scenes/performance";
 import Devices from "scenes/devices";
+import Attackers from "scenes/attackers";
+import TestAttack from "scenes/testAttack";
 
 function App() {
   const mode = useSelector((state) => state.global.mode);
@@ -33,6 +35,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/products" element={<Products />} />
               <Route path="/customers" element={<Customers />} />
+              <Route path="/attackers" element={<Attackers />} />
               <Route path="/devices" element={<Devices />} />
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/geography" element={<Geography />} />
@@ -42,6 +45,7 @@ function App() {
               <Route path="/breakdown" element={<Breakdown />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/performance" element={<Performance />} />
+              <Route path="/test" element={<TestAttack />} />
             </Route>
           </Routes>
         </ThemeProvider>

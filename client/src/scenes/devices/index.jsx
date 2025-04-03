@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  colors,
 } from "@mui/material";
 import {
   useGetDeviceQuery,
@@ -15,8 +16,11 @@ import {
   useDeleteDeviceMutation,
   useUpdateDeviceMutation,
 } from "state/api";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "components/Header";
+import EditIcon from "@mui/icons-material/Edit";
 import { DataGrid } from "@mui/x-data-grid";
+import "./style.css";
 
 // Hàm kiểm tra trạng thái website dựa trên IP
 const checkWebsiteStatus = async (ip, port) => {
@@ -82,7 +86,8 @@ const Devices = () => {
   const [addDevice] = useAddDeviceMutation();
   const [deleteDevice] = useDeleteDeviceMutation();
   const [updateDevice] = useUpdateDeviceMutation();
-
+  // State for viewing device details
+  const [viewDevice, setViewDevice] = useState(null);
   // State cho form thêm thiết bị
   const [open, setOpen] = useState(false);
   const [newDevice, setNewDevice] = useState({
@@ -106,52 +111,64 @@ const Devices = () => {
       console.error("Failed to delete device:", error);
     }
   };
+
+  // Function to open dialog for viewing device details
+  const handleViewDevice = (device) => {
+    setViewDevice(device);
+  };
+
   // Định nghĩa các cột cho DataGrid
   const columns = [
-    { field: "name", headerName: "Tên thiết bị", flex: 1 },
+    {
+      field: "name",
+      headerName: "Tên thiết bị",
+      flex: 1,
+      renderCell: (params) => (
+        <p
+          className="title-button"
+          onClick={() => handleViewDevice(params.row)}
+        >
+          {params.row.name}
+        </p>
+      ),
+    },
     { field: "ip", headerName: "Địa chỉ IP", flex: 1 },
     { field: "port", headerName: "Port", flex: 1 },
     {
       field: "status",
       headerName: "Trạng thái",
       flex: 1,
-      // Sử dụng component StatusCell, truyền ip của dòng dữ liệu
       renderCell: (params) => (
         <StatusCell ip={params.row.ip} port={params.row.port} />
       ),
     },
     { field: "createdAt", headerName: "Thêm ngày", flex: 1 },
-    // { field: "updatedAt", headerName: "Cập nhật cuối", flex: 1 },
+    { field: "updatedAt", headerName: "Cập nhật cuối", flex: 1 },
     {
       field: "actions",
       headerName: "Thao tác",
       flex: 1,
       renderCell: (params) => (
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: "flex", gap: "0px" }}>
           <Button
             variant="outlined"
             style={{
               color: "#fff", // Màu chữ trắng
-              borderColor: "#fff", // Viền trắng
-              backgroundColor: "transparent", // Nền trong suốt (hoặc đổi thành màu mong muốn)
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.1)", // Nền trắng mờ khi hover
-                borderColor: "#fff",
-              },
+              padding: "0",
             }}
             onClick={() => {
               setEditDevice(params.row);
               setEditOpen(true);
             }}
           >
-            Chỉnh sửa
+            <EditIcon />
           </Button>
           <Button
             variant="outlined"
-            color="error"
+            style={{ color: "#ff7669", padding: "0" }}
             onClick={() => handleDeleteDevice(params.row._id)}
           >
-            Xóa
+            <DeleteIcon />
           </Button>
         </div>
       ),
@@ -183,10 +200,17 @@ const Devices = () => {
   // Chỉnh sửa thiết bị
   const handleEditDevice = async () => {
     try {
-      await updateDevice({ id: editDevice._id, ...editDevice }).unwrap();
-      refetch();
-      setEditOpen(false);
-      setEditDevice(null);
+      // Add the current timestamp to the updatedAt field
+      const updatedDevice = {
+        ...editDevice,
+        updatedAt: new Date().toISOString(), // Add the current timestamp
+      };
+
+      // Call the updateDevice mutation with the updated device
+      await updateDevice({ id: editDevice._id, ...updatedDevice }).unwrap();
+      refetch(); // Refresh the data to reflect the changes
+      setEditOpen(false); // Close the edit form
+      setEditDevice(null); // Reset the edited device state
     } catch (error) {
       console.error("Failed to update device:", error);
     }
@@ -200,16 +224,16 @@ const Devices = () => {
 
   return (
     <Box m="1.5rem 2.5rem">
-      <Header title="DEVICES" subtitle="List of Devices" />
+      <Header title="GIÁM SÁT" subtitle="Danh sách các thiết bị" />
 
       {/* Nút mở dialog thêm thiết bị */}
       <Button
         variant="contained"
         color="primary"
         onClick={handleOpen}
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, mt: 2 }}
       >
-        Add Device
+        Đăng ký
       </Button>
 
       <Box
@@ -245,7 +269,66 @@ const Devices = () => {
           rowsPerPageOptions={[10, 20, 50]}
         />
       </Box>
-
+      {/* Dialog to view device details */}
+      <Dialog open={viewDevice !== null} onClose={() => setViewDevice(null)}>
+        <DialogTitle>Device Details</DialogTitle>
+        <DialogContent>
+          {viewDevice && (
+            <>
+              <TextField
+                label="Device Name"
+                value={viewDevice.name}
+                fullWidth
+                margin="dense"
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                label="IP Address"
+                value={viewDevice.ip}
+                fullWidth
+                margin="dense"
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                label="Port"
+                value={viewDevice.port}
+                fullWidth
+                margin="dense"
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                label="Created At"
+                value={viewDevice.createdAt}
+                fullWidth
+                margin="dense"
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                label="Updated At"
+                value={viewDevice.updatedAt}
+                fullWidth
+                margin="dense"
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewDevice(null)} color="secondary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Dialog để thêm thiết bị */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Device</DialogTitle>
@@ -320,8 +403,12 @@ const Devices = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEditClose}>Cancel</Button>
-          <Button onClick={handleEditDevice}>Save</Button>
+          <Button onClick={handleEditClose} style={{ color: "white" }}>
+            Hủy
+          </Button>
+          <Button onClick={handleEditDevice} style={{ color: "#74f7ba" }}>
+            Lưu
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

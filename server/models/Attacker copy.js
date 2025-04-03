@@ -1,16 +1,11 @@
 import mongoose from "mongoose";
 
-const DeviceSchema = new mongoose.Schema(
+const AttackerSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     ip: {
       type: String,
       required: true,
-      trim: true,
+      unique: true,
       validate: {
         validator: function (v) {
           return /^(([0-9]{1,3}\.){3}[0-9]{1,3})|(([a-f0-9:]+:+)+[a-f0-9]+)$/i.test(
@@ -20,19 +15,21 @@ const DeviceSchema = new mongoose.Schema(
         message: (props) => `${props.value} is not a valid IP address!`,
       },
     },
-    port: {
-      type: Number,
-      required: true,
-      min: [0, "Port must be greater than or equal to 0"],
-      max: [65535, "Port must be less than or equal to 65535"],
-      validate: {
-        validator: function (v) {
-          return Number.isInteger(v);
-        },
-        message: (props) => `${props.value} is not a valid port number!`,
+    location: {
+      longitude: {
+        type: Number,
+        required: true,
+        min: -180,
+        max: 180,
+      },
+      latitude: {
+        type: Number,
+        required: true,
+        min: -90,
+        max: 90,
       },
     },
-    last_active: {
+    latest_attack: {
       type: Date,
       default: Date.now,
     },
@@ -41,12 +38,6 @@ const DeviceSchema = new mongoose.Schema(
       enum: ["active", "inactive", "blocked"],
       default: "active",
     },
-    attackers: [
-      {
-        type: mongoose.Schema.Types.ObjectId, // Use ObjectId to reference the Attacker model
-        ref: "Attacker",
-      },
-    ],
   },
   {
     timestamps: true,
@@ -66,8 +57,8 @@ const DeviceSchema = new mongoose.Schema(
           ret.createdAt = formatter.format(new Date(ret.createdAt));
         if (ret.updatedAt)
           ret.updatedAt = formatter.format(new Date(ret.updatedAt));
-        if (ret.last_active)
-          ret.last_active = formatter.format(new Date(ret.last_active));
+        if (ret.latest_attack)
+          ret.latest_attack = formatter.format(new Date(ret.latest_attack));
 
         return ret;
       },
@@ -88,8 +79,8 @@ const DeviceSchema = new mongoose.Schema(
           ret.createdAt = formatter.format(new Date(ret.createdAt));
         if (ret.updatedAt)
           ret.updatedAt = formatter.format(new Date(ret.updatedAt));
-        if (ret.last_active)
-          ret.last_active = formatter.format(new Date(ret.last_active));
+        if (ret.latest_attack)
+          ret.latest_attack = formatter.format(new Date(ret.latest_attack));
 
         return ret;
       },
@@ -97,5 +88,6 @@ const DeviceSchema = new mongoose.Schema(
   }
 );
 
-const Device = mongoose.model("Device", DeviceSchema);
-export default Device;
+const Attacker = mongoose.model("Attacker", AttackerSchema);
+
+export default Attacker;

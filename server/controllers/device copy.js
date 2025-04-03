@@ -18,7 +18,7 @@ export const createDevice = async (req, res) => {
         .json({ message: "Port must be between 0 and 65535" });
     }
 
-    // Đảm bảo không có phần tử trùng lặp trong mảng attackers (truyền trực tiếp _id của attackers)
+    // Đảm bảo không có phần tử trùng lặp trong mảng attackers
     const uniqueAttackers = [...new Set(attackers || [])];
 
     // Tạo mới thiết bị
@@ -28,7 +28,7 @@ export const createDevice = async (req, res) => {
       port,
       status: status || "active",
       last_active: new Date(),
-      attackers: uniqueAttackers, // Lưu trực tiếp _id của attackers
+      attackers: uniqueAttackers,
     });
 
     await newDevice.save();
@@ -42,7 +42,7 @@ export const createDevice = async (req, res) => {
 // ✅ Lấy danh sách thiết bị
 export const getAllDevices = async (req, res) => {
   try {
-    const devices = await Device.find().populate("attackers");
+    const devices = await Device.find();
     res.status(200).json(devices);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -54,7 +54,7 @@ export const getDeviceById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const device = await Device.findById(id).populate("attackers");
+    const device = await Device.findById(id);
     if (!device) {
       return res.status(404).json({ message: "Device not found" });
     }
@@ -88,12 +88,10 @@ export const updateDevice = async (req, res) => {
       device.port = port;
     }
     if (status) device.status = status;
-
     if (attackers) {
       // Đảm bảo mảng attackers không bị trùng lặp
       device.attackers = [...new Set(attackers)];
     }
-
     device.last_active = new Date();
 
     await device.save();
