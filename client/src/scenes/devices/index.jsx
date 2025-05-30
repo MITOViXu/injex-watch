@@ -26,7 +26,7 @@ import "./style.css";
 const checkWebsiteStatus = async (ip, port) => {
   try {
     const strPort = port.toString();
-    const url = `http://${ip}:${strPort}`;
+    const url = `https://${ip}:${strPort}`;
     console.log("Địa chỉ URL:", url);
     console.log("port:", strPort);
     const response = await fetch(url);

@@ -59,20 +59,20 @@ const navItems = [
     link: "Attackers",
     icon: <ReceiptLongOutlined />,
   },
-  {
-    text: "Bản đồ",
-    link: "Geography",
-    icon: <PublicOutlined />,
-  },
+  // {
+  //   text: "Bản đồ",
+  //   link: "Geography",
+  //   icon: <PublicOutlined />,
+  // },
   {
     text: "Thống kê",
     icon: null,
   },
-  {
-    text: "Tổng quan",
-    link: "Overview",
-    icon: <PointOfSaleOutlined />,
-  },
+  // {
+  //   text: "Tổng quan",
+  //   link: "Overview",
+  //   icon: <PointOfSaleOutlined />,
+  // },
   {
     text: "Hằng ngày",
     link: "Daily",
@@ -83,11 +83,11 @@ const navItems = [
     link: "Monthly",
     icon: <CalendarMonthOutlined />,
   },
-  {
-    text: "Quý",
-    link: "Breakdown",
-    icon: <PieChartOutlined />,
-  },
+  // {
+  //   text: "Quý",
+  //   link: "Breakdown",
+  //   icon: <PieChartOutlined />,
+  // },
   {
     text: "Thử nghiệm",
     icon: null,

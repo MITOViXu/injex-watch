@@ -27,6 +27,7 @@ const Attackers = () => {
   const [pageSize, setPageSize] = useState(20);
   const [sort, setSort] = useState({});
   const [search, setSearch] = useState("");
+
   const [searchInput, setSearchInput] = useState("");
 
   const { data, isLoading } = useGetAllAttackersQuery({
@@ -70,11 +71,6 @@ const Attackers = () => {
           Lat: {params.value.latitude}, Long: {params.value.longitude}
         </Box>
       ),
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
     },
     {
       field: "latest_attack",

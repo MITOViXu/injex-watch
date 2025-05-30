@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   useTheme,
@@ -29,59 +29,88 @@ const TestAttack = () => {
     e.preventDefault();
 
     if (!username || !password) {
-      alert("Please enter both username and password");
+      alert("Nhập cả username và password");
       return;
     }
 
-    // Fetch IP address
-    fetch("https://api.ipify.org?format=json")
+    // Combine username and password
+    const input_val = `${username}${password}`;
+
+    // Send the combined input to the predict_sqli_attack API (Flask backend)
+    fetch("http://127.0.0.1:5000/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ input_val: input_val }), // Send combined input
+    })
       .then((response) => response.json())
-      .then((ipData) => {
-        const ip = ipData.ip;
-        console.log("User IP:", ip);
+      .then((data) => {
+        if (data.attack_detected) {
+          console.log("Phát hiện SQL injection!");
 
-        // Fetch location based on IP
-        fetch(`http://ip-api.com/json/${ip}`)
-          .then((response) => response.json())
-          .then((locationData) => {
-            const { lat, lon } = locationData;
-            console.log("Location: Latitude:", lat, "Longitude:", lon);
+          // Fetch IP address
+          fetch("https://api.ipify.org?format=json")
+            .then((response) => response.json())
+            .then((ipData) => {
+              const ip = ipData.ip;
+              console.log("User IP:", ip);
 
-            // Create attacker payload
-            const attackerData = {
-              ip: ip,
-              location: {
-                longitude: lon,
-                latitude: lat,
-              },
-              devices: [
-                {
-                  ip: "192.168.48.128", // Example device IP
-                  port: 3000, // Example device port
-                },
-              ],
-            };
+              // Fetch location based on IP
+              fetch(`http://ip-api.com/json/${ip}`)
+                .then((response) => response.json())
+                .then((locationData) => {
+                  const { lat, lon } = locationData;
+                  console.log("Location: Latitude:", lat, "Longitude:", lon);
 
-            // Add attacker to the database
-            addAttacker(attackerData)
-              .then((response) => {
-                console.log("Attacker added:", response);
-                alert(`Attacker added with IP: ${ip}`);
-                setOpen(false); // Close the dialog after success
-              })
-              .catch((error) => {
-                console.error("Error adding attacker:", error);
-                alert("Error adding attacker");
-              });
-          })
-          .catch((error) => {
-            console.error("Error fetching location:", error);
-            alert("Error fetching location");
-          });
+                  // Create attacker payload
+                  const attackerData = {
+                    ip: ip,
+                    location: {
+                      longitude: lon,
+                      latitude: lat,
+                    },
+                    devices: [
+                      {
+                        ip: "192.168.48.128", // Example device IP
+                        port: 3000, // Example device port
+                      },
+                    ],
+                  };
+
+                  // Add attacker to the database
+                  addAttacker(attackerData)
+                    .then((response) => {
+                      console.log("Thêm kẻ tấn công:", response);
+                      alert(`Attacker được thêm với địa chỉ IP: ${ip}`);
+                      setOpen(false); // Close the dialog after success
+                      setUsername("");
+                      setPassword("");
+                    })
+                    .catch((error) => {
+                      console.error("Xảy ra lỗi khi thêm Attacker:", error);
+                      alert("Xảy ra lỗi khi thêm Attacker");
+                    });
+                })
+                .catch((error) => {
+                  console.error("Lỗi xác định vị trí:", error);
+                  alert("Lỗi xác định vị trí");
+                });
+            })
+            .catch((error) => {
+              console.error("Lỗi xác định IP:", error);
+              alert("Lỗi xác định IP");
+            });
+        } else {
+          alert("Không phát hiện SQL injection.");
+          setUsername("");
+          setPassword("");
+          setOpen(false);
+        }
       })
       .catch((error) => {
-        console.error("Error fetching IP:", error);
-        alert("Error fetching IP address");
+        console.error("Lỗi AI:", error);
+        alert("Lỗi AI");
       });
   };
 

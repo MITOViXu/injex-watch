@@ -2,54 +2,63 @@ import React, { useMemo, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import Header from "components/Header";
 import { ResponsiveLine } from "@nivo/line";
-import { useGetSalesQuery } from "state/api";
+import { useGetAllAttackersQuery } from "state/api"; // Giả sử sử dụng hook lấy dữ liệu attackers
 import DatePicker from "react-datepicker";
+import { parse } from "date-fns"; // Import parse từ date-fns
 import "react-datepicker/dist/react-datepicker.css";
 
 const Daily = () => {
-  const [startDate, setStartDate] = useState(new Date("2021-02-01"));
-  const [endDate, setEndDate] = useState(new Date("2021-03-01"));
-  const { data } = useGetSalesQuery();
+  const [startDate, setStartDate] = useState(new Date("2025-04-01"));
+  const [endDate, setEndDate] = useState(new Date("2025-04-16"));
+  const { data } = useGetAllAttackersQuery();
   const theme = useTheme();
 
   const [formattedData] = useMemo(() => {
     if (!data) return [];
 
-    const { dailyData } = data;
-    const totalSalesLine = {
-      id: "totalSales",
+    console.log("Data: ", data); // Kiểm tra dữ liệu ban đầu
+    const attackLine = {
+      id: "attacks",
       color: theme.palette.secondary.main,
       data: [],
     };
-    const totalUnitsLine = {
-      id: "totalUnits",
-      color: theme.palette.secondary[600],
-      data: [],
-    };
 
-    Object.values(dailyData).forEach(({ date, totalSales, totalUnits }) => {
-      const dateFormatted = new Date(date);
-      if (dateFormatted >= startDate && dateFormatted <= endDate) {
-        const splitDate = date.substring(date.indexOf("-") + 1);
+    const attacksByDate = {};
 
-        totalSalesLine.data = [
-          ...totalSalesLine.data,
-          { x: splitDate, y: totalSales },
-        ];
-        totalUnitsLine.data = [
-          ...totalUnitsLine.data,
-          { x: splitDate, y: totalUnits },
-        ];
+    data.forEach((attacker) => {
+      // Chuyển đổi ngày tháng từ chuỗi "DD/MM/YYYY HH:mm:ss" thành đối tượng Date hợp lệ
+      const attackDate = parse(
+        attacker.latest_attack,
+        "HH:mm:ss dd/MM/yyyy",
+        new Date()
+      );
+
+      if (isNaN(attackDate)) {
+        console.warn("Invalid Date for attacker:", attacker);
+        return; // Nếu là "Invalid Date", bỏ qua phần tử này
+      }
+
+      console.log("Attack Date: ", attackDate);
+
+      if (attackDate >= startDate && attackDate <= endDate) {
+        const dateString = attackDate.toISOString().split("T")[0]; // Chuyển đổi sang định dạng YYYY-MM-DD
+        attacksByDate[dateString] = (attacksByDate[dateString] || 0) + 1;
       }
     });
 
-    const formattedData = [totalSalesLine, totalUnitsLine];
+    console.log("Attacks by Date: ", attacksByDate); // Kiểm tra kết quả nhóm dữ liệu
+
+    Object.keys(attacksByDate).forEach((date) => {
+      attackLine.data.push({ x: date, y: attacksByDate[date] });
+    });
+
+    const formattedData = [attackLine];
     return [formattedData];
-  }, [data, startDate, endDate]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [data, startDate, endDate]);
 
   return (
     <Box m="1.5rem 2.5rem">
-      <Header title="DAILY SALES" subtitle="Chart of daily sales" />
+      <Header title="Hoạt động của kẻ tấn công" subtitle="Tính theo ngày" />
       <Box height="75vh">
         <Box display="flex" justifyContent="flex-end">
           <Box>
@@ -128,7 +137,7 @@ const Daily = () => {
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 90,
-              legend: "Month",
+              legend: "Date",
               legendOffset: 60,
               legendPosition: "middle",
             }}
@@ -137,7 +146,7 @@ const Daily = () => {
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
-              legend: "Total",
+              legend: "Number of Attacks",
               legendOffset: -50,
               legendPosition: "middle",
             }}

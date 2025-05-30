@@ -1,16 +1,32 @@
 import Attacker from "../models/Attacker.js";
 import Device from "../models/Device.js";
 
-// ✅ Tạo mới một attacker
+// Tạo mới một attacker và lấy vị trí từ IP
 export const createAttacker = async (req, res) => {
   try {
-    const { ip, location, latest_time_attack, status, devices } = req.body;
+    const { ip, status, devices } = req.body;
+    console.log("ip address: ", ip);
+    // Lấy vị trí từ IP bằng fetch
+    const response = await fetch(`http://ip-api.com/json/${ip}`);
+    const locationData = await response.json();
 
-    // Tạo mới attacker
+    // Kiểm tra nếu vị trí trả về hợp lệ
+    if (locationData.status !== "success") {
+      return res.status(400).json({ message: "Không thể lấy vị trí từ IP" });
+    }
+
+    // Lấy lat và lon từ response
+    const { lat, lon } = locationData;
+    console.log("Location: Latitude:", lat, "Longitude:", lon);
+
+    // Tạo mới attacker với vị trí đã lấy được
     const attacker = await Attacker.create({
       ip,
-      location,
-      latest_attack: latest_time_attack || Date.now(),
+      location: {
+        latitude: lat,
+        longitude: lon,
+      },
+      latest_attack: Date.now(),
       status,
       devices,
     });
@@ -34,17 +50,18 @@ export const createAttacker = async (req, res) => {
   }
 };
 
-// ✅ Lấy tất cả attackers
 export const getAllAttackers = async (req, res) => {
   try {
-    const attackers = await Attacker.find();
+    // Sắp xếp theo trường 'latest_attack' (giảm dần)
+    const attackers = await Attacker.find().sort({ latest_attack: -1 }); // -1 là giảm dần
+
     res.status(200).json(attackers);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// ✅ Lấy thông tin chi tiết của một attacker theo ID
+// Lấy thông tin chi tiết của một attacker theo ID
 export const getAttackerById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -58,7 +75,7 @@ export const getAttackerById = async (req, res) => {
   }
 };
 
-// ✅ Cập nhật thông tin một attacker
+// Cập nhật thông tin một attacker
 export const updateAttacker = async (req, res) => {
   try {
     const { id } = req.params;
@@ -77,7 +94,7 @@ export const updateAttacker = async (req, res) => {
   }
 };
 
-// ✅ Xóa một attacker
+// Xóa một attacker
 export const deleteAttacker = async (req, res) => {
   try {
     const { id } = req.params;
@@ -101,7 +118,7 @@ export const deleteAttacker = async (req, res) => {
   }
 };
 
-// ✅ Tìm attacker theo IP Address
+// Tìm attacker theo IP Address
 export const getAttackerByIp = async (req, res) => {
   try {
     const { ip } = req.params;
