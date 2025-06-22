@@ -74,29 +74,29 @@ const navItems = [
   //   icon: <PointOfSaleOutlined />,
   // },
   {
-    text: "Hằng ngày",
+    text: "Thống kê",
     link: "Daily",
     icon: <TodayOutlined />,
   },
-  {
-    text: "Hằng tháng",
-    link: "Monthly",
-    icon: <CalendarMonthOutlined />,
-  },
+  // {
+  //   text: "Hằng tháng",
+  //   link: "Monthly",
+  //   icon: <CalendarMonthOutlined />,
+  // },
   // {
   //   text: "Quý",
   //   link: "Breakdown",
   //   icon: <PieChartOutlined />,
   // },
-  {
-    text: "Thử nghiệm",
-    icon: null,
-  },
-  {
-    text: "Tấn công",
-    link: "test",
-    icon: <AdminPanelSettingsOutlined />,
-  },
+  // {
+  //   text: "Thử nghiệm",
+  //   icon: null,
+  // },
+  // {
+  //   text: "Tấn công",
+  //   link: "test",
+  //   icon: <AdminPanelSettingsOutlined />,
+  // },
   // {
   //   text: "Hiệu suất",
   //   link: "Performance",

@@ -77,13 +77,14 @@ const Attackers = () => {
       headerName: "Last Attack",
       flex: 1,
     },
-    {
-      field: "devices",
-      headerName: "# of Devices",
-      flex: 0.5,
-      sortable: false,
-      renderCell: (params) => params.value.length,
-    },
+    // },
+    // {
+    //   field: "devices",
+    //   headerName: "# of Devices",
+    //   flex: 0.5,
+    //   sortable: false,
+    //   renderCell: (params) => params.value.length,
+    // },
   ];
 
   return (
