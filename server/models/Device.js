@@ -41,12 +41,12 @@ const DeviceSchema = new mongoose.Schema(
       enum: ["active", "inactive", "blocked"],
       default: "active",
     },
-    attackers: [
-      {
-        type: mongoose.Schema.Types.ObjectId, // Use ObjectId to reference the Attacker model
-        ref: "Attacker",
-      },
-    ],
+    attackers: {
+      type: Boolean,
+      default: false,
+      description:
+        "Indicates whether this device is under attack or has attackers",
+    },
   },
   {
     timestamps: true,
@@ -96,6 +96,45 @@ const DeviceSchema = new mongoose.Schema(
     },
   }
 );
+
+// Pre-save middleware to automatically update last_active when attackers status changes
+DeviceSchema.pre("save", function (next) {
+  if (this.isModified("attackers")) {
+    this.last_active = new Date();
+  }
+  next();
+});
+
+// Static method to mark device as under attack
+DeviceSchema.statics.markUnderAttack = function (deviceId) {
+  return this.findByIdAndUpdate(
+    deviceId,
+    {
+      attackers: true,
+      last_active: new Date(),
+      status: "blocked", // Optionally change status when under attack
+    },
+    { new: true }
+  );
+};
+
+// Static method to clear attack status
+DeviceSchema.statics.clearAttackStatus = function (deviceId) {
+  return this.findByIdAndUpdate(
+    deviceId,
+    {
+      attackers: false,
+      last_active: new Date(),
+      status: "active", // Reset to active when attack cleared
+    },
+    { new: true }
+  );
+};
+
+// Instance method to check if device is under attack
+DeviceSchema.methods.isUnderAttack = function () {
+  return this.attackers === true;
+};
 
 const Device = mongoose.model("Device", DeviceSchema);
 export default Device;
